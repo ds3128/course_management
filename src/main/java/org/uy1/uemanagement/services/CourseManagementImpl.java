@@ -36,6 +36,13 @@ public class CourseManagementImpl implements CourseManagement {
         if (courseRepository.existsByTitle(course.getTitle())) {
             throw new DuplicateCourseException("This course already exist");
         }
+        course = Course.builder()
+                .title(course.getTitle())
+                .description(course.getDescription())
+                .times(course.getTimes())
+                .supports(course.getSupports())
+                .auteur(course.getAuteur())
+                .build();
         Course savedCourse = courseRepository.save(course);
         return savedCourse;
     }
@@ -47,8 +54,13 @@ public class CourseManagementImpl implements CourseManagement {
         if (!courseRepository.existsById(course.getId())){
             throw new DuplicateCourseException("Course id not exist");
         }
-        Course save = courseRepository.save(course);
-        return save;
+        course.setTitle(course.getTitle());
+        course.setDescription(course.getDescription());
+        course.setTimes(course.getTimes());
+        course.setSupports(course.getSupports());
+        course.setAuteur(course.getAuteur());
+        Course updatedCourse = courseRepository.save(course);
+        return updatedCourse;
     }
 
     @Override
@@ -148,6 +160,7 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public Auteur createAuteur(Auteur auteur) {
+
         return null;
     }
 
