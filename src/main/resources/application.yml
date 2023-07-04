@@ -1,0 +1,16 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: course-management
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+  datasource:
+    url: jdbc:mysql://localhost:3306/course_management?createDatabaseIfNoExist=true
+    username: root
+    password:
