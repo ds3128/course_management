@@ -13,7 +13,7 @@ public interface CourseManagement {
    //Interface for course methods
 
    Course createCourse(Course course) throws DuplicateCourseException;
-   Course updateCourse(Course course, Long id) throws DuplicateCourseException;
+   Course updateCourse(Course course) throws DuplicateCourseException;
    void removeCourse(Long id);
    List<Course> getAllCourse();
    List<Course> findCourseByTitle(String name);
@@ -21,7 +21,7 @@ public interface CourseManagement {
    // Interface for supports methods
 
     Supports createSupports(Supports supports) throws DuplicateSupportsException;
-    Supports updateSupport(Supports supports, Long id) throws DuplicateSupportsException;
+    Supports updateSupport(Supports supports) throws DuplicateSupportsException;
     void removeSupport(Long id);
     List<Supports> getAllSupports();
     //List<Supports> findSupportsByName(String name);
@@ -29,7 +29,7 @@ public interface CourseManagement {
     // Interface for authors methods
 
     Auteur createAuteur(Auteur auteur);
-    Auteur updateCourse(Auteur auteur, Long id);
+    Auteur updateAuteur(Auteur auteur);
     void removeAuteur(Long id);
     List<Auteur> getAllAuteur();
     List<Auteur> findAuteurByName(String name);

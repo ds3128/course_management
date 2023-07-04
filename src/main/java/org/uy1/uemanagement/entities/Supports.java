@@ -16,5 +16,8 @@ public class Supports {
     private Long id;
     private String title;
     private TypeSupport typeSupport;
+    private String documentDirectory;
+    private String videoDirectory;
+    private String linkDirectory;
     private String auteur;
 }

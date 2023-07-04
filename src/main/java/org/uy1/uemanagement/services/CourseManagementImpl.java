@@ -13,7 +13,7 @@ import org.uy1.uemanagement.repositories.CourseRepository;
 import org.uy1.uemanagement.repositories.SupportRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -33,31 +33,20 @@ public class CourseManagementImpl implements CourseManagement {
     @Override
     public Course createCourse(Course course) throws DuplicateCourseException {
         log.info("Creating course");
-        if (courseRepository.existsByTitle()){
+        if (courseRepository.existsByTitle(course.getTitle())) {
             throw new DuplicateCourseException("This course already exist");
         }
-        Course saveCourse = Course.builder()
-                .title(course.getTitle())
-                .description(course.getDescription())
-                .times(course.getTimes())
-                .supports(course.getSupports())
-                .auteur(course.getAuteur())
-                .build();
-        Course save = courseRepository.save(saveCourse);
-        return save;
+        Course savedCourse = courseRepository.save(course);
+        return savedCourse;
     }
 
+
     @Override
-    public Course updateCourse(Course course, Long id) throws DuplicateCourseException {
+    public Course updateCourse(Course course) throws DuplicateCourseException {
         log.info("Updating course");
-        if (courseRepository.existsById(id)){
-            throw new DuplicateCourseException("Course id already exist");
+        if (!courseRepository.existsById(course.getId())){
+            throw new DuplicateCourseException("Course id not exist");
         }
-        course.setTitle(course.getTitle());
-        course.setDescription(course.getDescription());
-        course.setTimes(course.getTimes());
-        course.setSupports(course.getSupports());
-        course.setAuteur(course.getAuteur());
         Course save = courseRepository.save(course);
         return save;
     }
@@ -69,53 +58,92 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public List<Course> getAllCourse() {
-        List<Course> allCourse = courseRepository.findAll().stream().collect(Collectors.toList());
-        return allCourse;
+        return courseRepository.findAll();
     }
+
 
     @Override
     public List<Course> findCourseByTitle(String name) {
-
-        return null;
+        return courseRepository.findByTitle(name);
     }
+
 
     @Override
     public Supports createSupports(Supports supports) throws DuplicateSupportsException {
-        if (supportRepository.existsByTitle()){
-            throw new DuplicateSupportsException("This supports already exist");
+        if (supportRepository.existsByTitle(supports.getTitle())) {
+            throw new DuplicateSupportsException("This support already exist");
         }
+
         Supports saveSupports = Supports.builder()
                 .title(supports.getTitle())
                 .typeSupport(supports.getTypeSupport())
                 .auteur(supports.getAuteur())
                 .build();
-//        Supports saveSupports = new Supports();
-//        saveSupports.getTitle();
-//        saveSupports.getTypeSupport();
-//        saveSupports.getAuteur();
+
+        switch (supports.getTypeSupport()) {
+            case DOCUMENTS:
+                saveSupports.setDocumentDirectory(supports.getDocumentDirectory());
+                break;
+            case VIDEO:
+                saveSupports.setVideoDirectory(supports.getVideoDirectory());
+                break;
+            case LINKS:
+                saveSupports.setLinkDirectory(supports.getLinkDirectory());
+                break;
+            default:
+                throw new IllegalArgumentException("Type of support is invalid");
+        }
         return supportRepository.save(saveSupports);
     }
 
+
     @Override
-    public Supports updateSupport(Supports supports, Long id) throws DuplicateSupportsException {
-        if (supportRepository.existsById(id)){
-            throw new DuplicateSupportsException("This Support id already exist");
+    public Supports updateSupport(Supports supports) throws DuplicateSupportsException {
+        Optional<Supports> existingSupportOptional = supportRepository.findById(supports.getId());
+        if (existingSupportOptional.isEmpty()) {
+            throw new DuplicateSupportsException("Support id those not exist");
         }
-        supports.setTitle(supports.getTitle());
-        supports.setTypeSupport(supports.getTypeSupport());
-        supports.setAuteur(supports.getAuteur());
-        return supportRepository.save(supports);
+
+        Supports existingSupport = existingSupportOptional.get();
+
+        existingSupport.setTitle(supports.getTitle());
+        existingSupport.setTypeSupport(supports.getTypeSupport());
+        existingSupport.setAuteur(supports.getAuteur());
+
+        switch (supports.getTypeSupport()) {
+            case DOCUMENTS:
+                existingSupport.setDocumentDirectory(supports.getDocumentDirectory());
+                existingSupport.setVideoDirectory(null);
+                existingSupport.setLinkDirectory(null);
+                break;
+            case VIDEO:
+                existingSupport.setDocumentDirectory(null);
+                existingSupport.setVideoDirectory(supports.getVideoDirectory());
+                existingSupport.setLinkDirectory(null);
+                break;
+            case LINKS:
+                existingSupport.setDocumentDirectory(null);
+                existingSupport.setVideoDirectory(null);
+                existingSupport.setLinkDirectory(supports.getLinkDirectory());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid type of support");
+        }
+
+        return supportRepository.save(existingSupport);
     }
+
+
+
 
     @Override
     public void removeSupport(Long id) {
-
+        supportRepository.deleteById(id);
     }
 
     @Override
     public List<Supports> getAllSupports() {
-
-        return null;
+        return supportRepository.findAll();
     }
 
     @Override
@@ -124,7 +152,7 @@ public class CourseManagementImpl implements CourseManagement {
     }
 
     @Override
-    public Auteur updateCourse(Auteur auteur, Long id) {
+    public Auteur updateAuteur(Auteur auteur) {
         return null;
     }
 
