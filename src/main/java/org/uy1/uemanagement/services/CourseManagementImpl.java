@@ -6,8 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.uy1.uemanagement.entities.Auteur;
 import org.uy1.uemanagement.entities.Course;
 import org.uy1.uemanagement.entities.Supports;
-import org.uy1.uemanagement.execptions.DuplicateCourseException;
-import org.uy1.uemanagement.execptions.DuplicateSupportsException;
+import org.uy1.uemanagement.execptions.*;
 import org.uy1.uemanagement.repositories.AuteurRepository;
 import org.uy1.uemanagement.repositories.CourseRepository;
 import org.uy1.uemanagement.repositories.SupportRepository;
@@ -65,6 +64,7 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public void removeCourse(Long id) {
+        courseRepository.findById(id).orElseThrow(() -> new CourseNotFoundException("This course id those not exist"));
         courseRepository.deleteById(id);
     }
 
@@ -76,7 +76,7 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public List<Course> findCourseByTitle(String name) {
-        return courseRepository.findByTitle(name);
+        return courseRepository.findByTitleContainingIgnoreCase(name);
     }
 
 
@@ -111,38 +111,33 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public Supports updateSupport(Supports supports) throws DuplicateSupportsException {
-        Optional<Supports> existingSupportOptional = supportRepository.findById(supports.getId());
-        if (existingSupportOptional.isEmpty()) {
-            throw new DuplicateSupportsException("Support id those not exist");
-        }
+        supportRepository.findById(supports.getId()).orElseThrow(() -> new DuplicateSupportsException("This support id those not exist"));
 
-        Supports existingSupport = existingSupportOptional.get();
-
-        existingSupport.setTitle(supports.getTitle());
-        existingSupport.setTypeSupport(supports.getTypeSupport());
-        existingSupport.setAuteur(supports.getAuteur());
+        supports.setTitle(supports.getTitle());
+        supports.setTypeSupport(supports.getTypeSupport());
+        supports.setAuteur(supports.getAuteur());
 
         switch (supports.getTypeSupport()) {
             case DOCUMENTS:
-                existingSupport.setDocumentDirectory(supports.getDocumentDirectory());
-                existingSupport.setVideoDirectory(null);
-                existingSupport.setLinkDirectory(null);
+                supports.setDocumentDirectory(supports.getDocumentDirectory());
+                supports.setVideoDirectory(null);
+                supports.setLinkDirectory(null);
                 break;
             case VIDEO:
-                existingSupport.setDocumentDirectory(null);
-                existingSupport.setVideoDirectory(supports.getVideoDirectory());
-                existingSupport.setLinkDirectory(null);
+                supports.setDocumentDirectory(null);
+                supports.setVideoDirectory(supports.getVideoDirectory());
+                supports.setLinkDirectory(null);
                 break;
             case LINKS:
-                existingSupport.setDocumentDirectory(null);
-                existingSupport.setVideoDirectory(null);
-                existingSupport.setLinkDirectory(supports.getLinkDirectory());
+                supports.setDocumentDirectory(null);
+                supports.setVideoDirectory(null);
+                supports.setLinkDirectory(supports.getLinkDirectory());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid type of support");
         }
 
-        return supportRepository.save(existingSupport);
+        return supportRepository.save(supports);
     }
 
 
@@ -150,37 +145,65 @@ public class CourseManagementImpl implements CourseManagement {
 
     @Override
     public void removeSupport(Long id) {
+        log.info("deleting support");
+        supportRepository.findById(id).orElseThrow(() -> new SupportNotFoundException("Support id not exist"));
         supportRepository.deleteById(id);
     }
 
     @Override
     public List<Supports> getAllSupports() {
-        return supportRepository.findAll();
+        List<Supports> all = supportRepository.findAll();
+        return all;
     }
 
     @Override
-    public Auteur createAuteur(Auteur auteur) {
-
-        return null;
+    public Auteur createAuteur(Auteur auteur) throws DuplicateAuteurException, DuplicatePhoneNumberException {
+        log.info("Saving auteur");
+        if (auteurRepository.existsByEmail(auteur.getEmail())){
+            throw new DuplicateAuteurException("The auteur already exist");
+        }
+        if (auteurRepository.existsByTel(auteur.getTel())){
+            throw new DuplicatePhoneNumberException("This phone number already exist");
+        }
+        auteur = Auteur.builder()
+                .firstName(auteur.getFirstName())
+                .lastName(auteur.getLastName())
+                .email(auteur.getEmail())
+                .tel(auteur.getTel())
+                .grade(auteur.getGrade())
+                .build();
+        Auteur savedAuteur = auteurRepository.save(auteur);
+        return savedAuteur;
     }
 
     @Override
     public Auteur updateAuteur(Auteur auteur) {
-        return null;
+        auteurRepository.findById(auteur.getId()).orElseThrow(() -> new NotFoundAuteurException("This auteur those not exist"));
+        auteur.setFirstName(auteur.getFirstName());
+        auteur.setLastName(auteur.getLastName());
+        auteur.setEmail(auteur.getEmail());
+        auteur.setTel(auteur.getTel());
+        auteur.setGrade(auteur.getGrade());
+        Auteur updatedAuteur = auteurRepository.save(auteur);
+        return updatedAuteur;
     }
 
     @Override
     public void removeAuteur(Long id) {
-
+        log.info("Deleting auteur");
+        auteurRepository.findById(id).orElseThrow(() -> new NotFoundAuteurException("Auteur id those not exist"));
+        auteurRepository.deleteById(id);
     }
 
     @Override
     public List<Auteur> getAllAuteur() {
-        return null;
+        List<Auteur> all = auteurRepository.findAll();
+        return all;
     }
 
     @Override
     public List<Auteur> findAuteurByName(String name) {
-        return null;
+        return auteurRepository.findByNameContainingIgnoreCase(name);
     }
+
 }

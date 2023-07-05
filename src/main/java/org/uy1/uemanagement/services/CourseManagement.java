@@ -3,7 +3,9 @@ package org.uy1.uemanagement.services;
 import org.uy1.uemanagement.entities.Auteur;
 import org.uy1.uemanagement.entities.Course;
 import org.uy1.uemanagement.entities.Supports;
+import org.uy1.uemanagement.execptions.DuplicateAuteurException;
 import org.uy1.uemanagement.execptions.DuplicateCourseException;
+import org.uy1.uemanagement.execptions.DuplicatePhoneNumberException;
 import org.uy1.uemanagement.execptions.DuplicateSupportsException;
 
 import java.util.List;
@@ -28,7 +30,7 @@ public interface CourseManagement {
 
     // Interface for authors methods
 
-    Auteur createAuteur(Auteur auteur);
+    Auteur createAuteur(Auteur auteur) throws DuplicateAuteurException, DuplicatePhoneNumberException;
     Auteur updateAuteur(Auteur auteur);
     void removeAuteur(Long id);
     List<Auteur> getAllAuteur();

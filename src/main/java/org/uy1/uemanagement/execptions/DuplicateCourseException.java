@@ -1,6 +1,6 @@
 package org.uy1.uemanagement.execptions;
 
-public class DuplicateCourseException extends Throwable {
+public class DuplicateCourseException extends RuntimeException {
     public DuplicateCourseException(String message) {
         super(message);
     }
