@@ -206,8 +206,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Auteur> findAuteurByName(String name) {
-        return auteurRepository.findByNameContainingIgnoreCase(name);
+    public List<Auteur> findAuteurByName(String firstName) {
+        List<Auteur> byNameContainingIgnoreCase = auteurRepository.findByFirstNameContainingIgnoreCase(firstName);
+        return byNameContainingIgnoreCase;
     }
 
 }

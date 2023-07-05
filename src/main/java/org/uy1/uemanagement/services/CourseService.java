@@ -34,6 +34,6 @@ public interface CourseService {
     Auteur updateAuteur(Auteur auteur);
     void removeAuteur(Long id);
     List<Auteur> getAllAuteur();
-    List<Auteur> findAuteurByName(String name);
+    List<Auteur> findAuteurByName(String firstName);
 
 }

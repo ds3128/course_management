@@ -22,6 +22,6 @@ public class Course {
     private int times;
     @OneToMany(fetch = FetchType.EAGER)
     private List<Supports> supports;
-    @OneToOne(mappedBy = "course")
+    @OneToOne
     private Auteur auteur;
 }
