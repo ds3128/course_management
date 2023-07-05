@@ -12,18 +12,17 @@ import org.uy1.uemanagement.repositories.CourseRepository;
 import org.uy1.uemanagement.repositories.SupportRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
 @Slf4j
-public class CourseManagementImpl implements CourseManagement {
+public class CourseServiceImpl implements CourseService {
 
     private CourseRepository courseRepository;
     private SupportRepository supportRepository;
     private AuteurRepository auteurRepository;
 
-    public CourseManagementImpl(CourseRepository courseRepository, SupportRepository supportRepository, AuteurRepository auteurRepository) {
+    public CourseServiceImpl(CourseRepository courseRepository, SupportRepository supportRepository, AuteurRepository auteurRepository) {
         this.courseRepository = courseRepository;
         this.supportRepository = supportRepository;
         this.auteurRepository = auteurRepository;

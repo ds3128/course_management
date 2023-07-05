@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.uy1.uemanagement.enums.Grade;
 
 @Entity
 @Data @AllArgsConstructor @NoArgsConstructor
@@ -18,5 +17,5 @@ public class Auteur {
     private String lastName;
     private String tel;
     private String email;
-    private Grade grade;
+    private String grade;
 }

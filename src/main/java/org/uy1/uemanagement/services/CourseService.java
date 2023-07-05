@@ -10,7 +10,7 @@ import org.uy1.uemanagement.execptions.DuplicateSupportsException;
 
 import java.util.List;
 
-public interface CourseManagement {
+public interface CourseService {
 
    //Interface for course methods
 
