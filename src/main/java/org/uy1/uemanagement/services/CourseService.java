@@ -26,7 +26,7 @@ public interface CourseService {
     Supports updateSupport(Supports supports) throws DuplicateSupportsException;
     void removeSupport(Long id);
     List<Supports> getAllSupports();
-    //List<Supports> findSupportsByName(String name);
+    List<Supports> getSupportByTitle(String name);
 
     // Interface for authors methods
 

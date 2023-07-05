@@ -156,6 +156,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public List<Supports> getSupportByTitle(String name) {
+        return supportRepository.findByTitleContainingIgnoreCase(name);
+    }
+
+    @Override
     public Auteur createAuteur(Auteur auteur) throws DuplicateAuteurException, DuplicatePhoneNumberException {
         log.info("Saving auteur");
         if (auteurRepository.existsByEmail(auteur.getEmail())){
