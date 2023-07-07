@@ -2,6 +2,7 @@ package org.uy1.uemanagement.web;
 
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.uy1.uemanagement.entities.Auteur;
 import org.uy1.uemanagement.entities.Course;
@@ -9,9 +10,10 @@ import org.uy1.uemanagement.entities.Supports;
 import org.uy1.uemanagement.services.CourseService;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api/course")
+@CrossOrigin("*")
 public class CourseRestController {
     private CourseService courseService;
 
@@ -20,33 +22,33 @@ public class CourseRestController {
     }
 
     // Controller for all Course
-    @PostMapping("/newCourse")
+    @PostMapping("/course/newCourse")
     @ResponseStatus(HttpStatus.CREATED)
     public Course createCourse(@RequestBody Course course){
         return courseService.createCourse(course);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/course/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Course updateCourse(@RequestBody Course course, @PathVariable("id") Long courseId){
         course.setId(courseId);
         return courseService.updateCourse(course);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/course/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteCourse(@PathVariable("id") Long courseId){
         courseService.removeCourse(courseId);
     }
-    @GetMapping("/allCourse")
+    @GetMapping("/course/allCourse")
     @ResponseStatus(HttpStatus.CREATED)
     public List<Course> getAllCourse(){
         return courseService.getAllCourse();
     }
 
-    @GetMapping("/search")
+    @GetMapping("/course/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<Course> getCourseByTitle(@RequestParam("courseTitle") String courseTitle){
+    public List<Course> getCourseByTitle(@RequestParam(name = "keyword") String courseTitle){
         return courseService.findCourseByTitle(courseTitle);
     }
 
@@ -77,7 +79,7 @@ public class CourseRestController {
     }
     @GetMapping("/support/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<Supports> getSupportByTitle(@RequestParam("supportTitle") String supportTitle){
+    public List<Supports> getSupportByTitle(@RequestParam("keyword") String supportTitle){
         return courseService.getSupportByTitle(supportTitle);
     }
 
@@ -95,6 +97,18 @@ public class CourseRestController {
         return courseService.updateAuteur(auteur);
     }
 
+    @GetMapping("/auteur/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Auteur> searchAuteurById(@PathVariable Long id) {
+        Optional<Auteur> auteurOptional = courseService.searchAuteurById(id);
+        if (auteurOptional.isPresent()) {
+            return ResponseEntity.ok(auteurOptional.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
     @DeleteMapping("/auteur/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteAuteur(@PathVariable("id") Long auteurId){
@@ -109,7 +123,30 @@ public class CourseRestController {
 
     @GetMapping("/auteur/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<Auteur> getAuteurByTitle(@RequestParam("auteurTitle") String auteurTitle){
-        return courseService.findAuteurByName(auteurTitle);
+    public List<Auteur> searchAuteur(@RequestParam(name = "keyword", defaultValue = "") String keyword){
+        List<Auteur> auteurs = courseService.searchAuteur("%"+keyword+"%");
+        return auteurs;
     }
+
+    //Statistics about course and supports
+    @GetMapping("/supports_number")
+    @ResponseStatus(HttpStatus.OK)
+    public Integer getSupportsNumber() {
+        int supportNumber = courseService.getSupportNumber();
+        return supportNumber;
+    }
+
+//    @GetMapping("/uploaded_file_number")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Integer getUploadedFileNumber() {
+//        int uploadedFileNumber = courseService.getUploadedFileNumber();
+//        return uploadedFileNumber;
+//    }
+//
+//    @GetMapping("/documents_size")
+//    @ResponseStatus(HttpStatus.OK)
+//    public Double getSizeDocument() {
+//        double documentsSize = courseService.getSizeDocuments();
+//        return documentsSize;
+//    }
 }

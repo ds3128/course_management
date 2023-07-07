@@ -15,9 +15,14 @@ public class Supports {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Enumerated(EnumType.STRING)
     private TypeSupport typeSupport;
-    private String documentDirectory;
-    private String videoDirectory;
     private String linkDirectory;
+    @Lob
+    @Column(name = "document_content")
+    private byte[] documentContent;
+    @Lob
+    @Column(name = "video_content")
+    private byte[] videoContent;
     private String auteur;
 }

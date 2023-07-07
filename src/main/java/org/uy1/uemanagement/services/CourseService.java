@@ -9,6 +9,7 @@ import org.uy1.uemanagement.execptions.DuplicatePhoneNumberException;
 import org.uy1.uemanagement.execptions.DuplicateSupportsException;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CourseService {
 
@@ -33,7 +34,14 @@ public interface CourseService {
     Auteur createAuteur(Auteur auteur) throws DuplicateAuteurException, DuplicatePhoneNumberException;
     Auteur updateAuteur(Auteur auteur);
     void removeAuteur(Long id);
+    Optional<Auteur> searchAuteurById(Long id);
     List<Auteur> getAllAuteur();
-    List<Auteur> findAuteurByName(String firstName);
+    List<Auteur> searchAuteur(String keyword);
+
+    // Nombre de fichier charge, Taille des fichiers et Nombre de champs
+
+    int getSupportNumber();
+//    int getUploadedFileNumber();
+//    Double getSizeDocuments();
 
 }

@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.UUID;
+import org.uy1.uemanagement.enums.Grade;
 
 @Entity
 @Data @AllArgsConstructor @NoArgsConstructor
@@ -19,7 +18,6 @@ public class Auteur {
     private String lastName;
     private String tel;
     private String email;
-    private String grade;
-    @OneToOne
-    private Course course;
+    @Enumerated(EnumType.STRING)
+    private Grade grade;
 }

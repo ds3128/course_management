@@ -12,6 +12,8 @@ import org.uy1.uemanagement.repositories.CourseRepository;
 import org.uy1.uemanagement.repositories.SupportRepository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,8 +40,7 @@ public class CourseServiceImpl implements CourseService {
                 .title(course.getTitle())
                 .description(course.getDescription())
                 .times(course.getTimes())
-                .supports(course.getSupports())
-                .auteur(course.getAuteur())
+                .nbCredit(course.getNbCredit())
                 .build();
         Course savedCourse = courseRepository.save(course);
         return savedCourse;
@@ -55,8 +56,7 @@ public class CourseServiceImpl implements CourseService {
         course.setTitle(course.getTitle());
         course.setDescription(course.getDescription());
         course.setTimes(course.getTimes());
-        course.setSupports(course.getSupports());
-        course.setAuteur(course.getAuteur());
+        course.setNbCredit(course.getNbCredit());
         Course updatedCourse = courseRepository.save(course);
         return updatedCourse;
     }
@@ -81,8 +81,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Supports createSupports(Supports supports) throws DuplicateSupportsException {
+        Auteur auteur = new Auteur();
         if (supportRepository.existsByTitle(supports.getTitle())) {
-            throw new DuplicateSupportsException("This support already exist");
+            throw new DuplicateSupportsException("This support already exists");
         }
 
         Supports saveSupports = Supports.builder()
@@ -93,12 +94,18 @@ public class CourseServiceImpl implements CourseService {
 
         switch (supports.getTypeSupport()) {
             case DOCUMENTS:
-                saveSupports.setDocumentDirectory(supports.getDocumentDirectory());
+                saveSupports.setDocumentContent(supports.getDocumentContent());
+                saveSupports.setLinkDirectory(null);
+                saveSupports.setVideoContent(null);
                 break;
             case VIDEO:
-                saveSupports.setVideoDirectory(supports.getVideoDirectory());
+                saveSupports.setDocumentContent(null);
+                saveSupports.setLinkDirectory(null);
+                saveSupports.setVideoContent(supports.getVideoContent());
                 break;
             case LINKS:
+                saveSupports.setVideoContent(null);
+                saveSupports.setDocumentContent(null);
                 saveSupports.setLinkDirectory(supports.getLinkDirectory());
                 break;
             default:
@@ -108,35 +115,36 @@ public class CourseServiceImpl implements CourseService {
     }
 
 
+
     @Override
     public Supports updateSupport(Supports supports) throws DuplicateSupportsException {
-        supportRepository.findById(supports.getId()).orElseThrow(() -> new DuplicateSupportsException("This support id those not exist"));
+        Supports supports1 = supportRepository.findById(supports.getId()).orElseThrow(() -> new DuplicateSupportsException("This support id those not exist"));
 
-        supports.setTitle(supports.getTitle());
-        supports.setTypeSupport(supports.getTypeSupport());
-        supports.setAuteur(supports.getAuteur());
+        supports1.setTitle(supports.getTitle());
+        supports1.setTypeSupport(supports.getTypeSupport());
+        supports1.setAuteur(supports.getAuteur());
 
         switch (supports.getTypeSupport()) {
             case DOCUMENTS:
-                supports.setDocumentDirectory(supports.getDocumentDirectory());
-                supports.setVideoDirectory(null);
-                supports.setLinkDirectory(null);
+                supports1.setDocumentContent(supports.getDocumentContent());
+                supports1.setVideoContent(null);
+                supports1.setLinkDirectory(null);
                 break;
             case VIDEO:
-                supports.setDocumentDirectory(null);
-                supports.setVideoDirectory(supports.getVideoDirectory());
-                supports.setLinkDirectory(null);
+                supports1.setDocumentContent(null);
+                supports1.setVideoContent(supports.getVideoContent());
+                supports1.setLinkDirectory(null);
                 break;
             case LINKS:
-                supports.setDocumentDirectory(null);
-                supports.setVideoDirectory(null);
-                supports.setLinkDirectory(supports.getLinkDirectory());
+                supports1.setDocumentContent(null);
+                supports1.setVideoContent(null);
+                supports1.setLinkDirectory(supports.getLinkDirectory());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid type of support");
         }
 
-        return supportRepository.save(supports);
+        return supportRepository.save(supports1);
     }
 
 
@@ -182,6 +190,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Auteur updateAuteur(Auteur auteur) {
+        log.info("Updating auteur");
         auteurRepository.findById(auteur.getId()).orElseThrow(() -> new NotFoundAuteurException("This auteur those not exist"));
         auteur.setFirstName(auteur.getFirstName());
         auteur.setLastName(auteur.getLastName());
@@ -200,15 +209,36 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Optional<Auteur> searchAuteurById(Long id) {
+        Optional<Auteur> byId = auteurRepository.findById(id);
+        return byId;
+    }
+
+    @Override
     public List<Auteur> getAllAuteur() {
         List<Auteur> all = auteurRepository.findAll();
         return all;
     }
 
     @Override
-    public List<Auteur> findAuteurByName(String firstName) {
-        List<Auteur> byNameContainingIgnoreCase = auteurRepository.findByFirstNameContainingIgnoreCase(firstName);
+    public List<Auteur> searchAuteur(String keyword) {
+        List<Auteur> byNameContainingIgnoreCase = auteurRepository.searchAuteur(keyword).stream().collect(Collectors.toList());
         return byNameContainingIgnoreCase;
     }
+
+    @Override
+    public int getSupportNumber() {
+        return (int) supportRepository.count();
+    }
+
+//    @Override
+//    public int getUploadedFileNumber() {
+//        return supportRepository.countUploadedFile();
+//    }
+//
+//    @Override
+//    public Double getSizeDocuments() {
+//        return supportRepository.getTotalSize();
+//    }
 
 }

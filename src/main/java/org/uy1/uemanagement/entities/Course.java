@@ -1,5 +1,6 @@
 package org.uy1.uemanagement.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,8 +21,8 @@ public class Course {
     private String title;
     private String description;
     private int times;
+    private int nbCredit;
     @OneToMany(fetch = FetchType.EAGER)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Supports> supports;
-    @OneToOne
-    private Auteur auteur;
 }
