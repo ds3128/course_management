@@ -210,6 +210,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Optional<Auteur> searchAuteurById(Long id) {
+        log.info("finding auteur with id : " +id);
         Optional<Auteur> byId = auteurRepository.findById(id);
         return byId;
     }

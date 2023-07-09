@@ -1,6 +1,7 @@
 package org.uy1.uemanagement.web;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")
+@Slf4j
 public class CourseRestController {
     private CourseService courseService;
 
@@ -92,7 +94,7 @@ public class CourseRestController {
 
     @PutMapping("/auteur/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Auteur updateAuteur(@PathVariable Long id, Auteur auteur){
+    public Auteur updateAuteur(@PathVariable Long id, @RequestBody Auteur auteur){
         auteur.setId(id);
         return courseService.updateAuteur(auteur);
     }
