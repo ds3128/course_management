@@ -25,4 +25,6 @@ public class Supports {
     @Column(name = "video_content")
     private byte[] videoContent;
     private String auteur;
+    @ManyToOne
+    private Course course;
 }

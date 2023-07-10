@@ -22,7 +22,7 @@ public class Course {
     private String description;
     private int times;
     private int nbCredit;
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "course", fetch = FetchType.EAGER)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private List<Supports> supports;
 }
