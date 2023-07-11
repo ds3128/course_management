@@ -11,6 +11,7 @@ import org.uy1.uemanagement.repositories.AuteurRepository;
 import org.uy1.uemanagement.repositories.CourseRepository;
 import org.uy1.uemanagement.repositories.SupportRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -96,7 +97,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Supports createSupports(Supports supports) throws DuplicateSupportsException {
-        Auteur auteur = new Auteur();
         if (supportRepository.existsByTitle(supports.getTitle())) {
             throw new DuplicateSupportsException("This support already exists");
         }
@@ -108,23 +108,22 @@ public class CourseServiceImpl implements CourseService {
                 .build();
 
         switch (supports.getTypeSupport()) {
-            case DOCUMENTS:
+            case DOCUMENTS -> {
                 saveSupports.setDocumentContent(supports.getDocumentContent());
                 saveSupports.setLinkDirectory(null);
                 saveSupports.setVideoContent(null);
-                break;
-            case VIDEO:
+            }
+            case VIDEO -> {
                 saveSupports.setDocumentContent(null);
                 saveSupports.setLinkDirectory(null);
                 saveSupports.setVideoContent(supports.getVideoContent());
-                break;
-            case LINKS:
+            }
+            case LINKS -> {
                 saveSupports.setVideoContent(null);
                 saveSupports.setDocumentContent(null);
                 saveSupports.setLinkDirectory(supports.getLinkDirectory());
-                break;
-            default:
-                throw new IllegalArgumentException("Type of support is invalid");
+            }
+            default -> throw new IllegalArgumentException("Type of support is invalid");
         }
         return supportRepository.save(saveSupports);
     }
@@ -140,23 +139,22 @@ public class CourseServiceImpl implements CourseService {
         supports1.setAuteur(supports.getAuteur());
 
         switch (supports.getTypeSupport()) {
-            case DOCUMENTS:
+            case DOCUMENTS -> {
                 supports1.setDocumentContent(supports.getDocumentContent());
                 supports1.setVideoContent(null);
                 supports1.setLinkDirectory(null);
-                break;
-            case VIDEO:
+            }
+            case VIDEO -> {
                 supports1.setDocumentContent(null);
                 supports1.setVideoContent(supports.getVideoContent());
                 supports1.setLinkDirectory(null);
-                break;
-            case LINKS:
+            }
+            case LINKS -> {
                 supports1.setDocumentContent(null);
                 supports1.setVideoContent(null);
                 supports1.setLinkDirectory(supports.getLinkDirectory());
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid type of support");
+            }
+            default -> throw new IllegalArgumentException("Invalid type of support");
         }
 
         return supportRepository.save(supports1);
@@ -174,8 +172,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Supports> getAllSupports() {
-        List<Supports> all = supportRepository.findAll();
-        return all;
+        return supportRepository.findAll();
     }
 
     @Override
@@ -199,8 +196,7 @@ public class CourseServiceImpl implements CourseService {
                 .tel(auteur.getTel())
                 .grade(auteur.getGrade())
                 .build();
-        Auteur savedAuteur = auteurRepository.save(auteur);
-        return savedAuteur;
+        return auteurRepository.save(auteur);
     }
 
     @Override
@@ -212,8 +208,7 @@ public class CourseServiceImpl implements CourseService {
         auteur.setEmail(auteur.getEmail());
         auteur.setTel(auteur.getTel());
         auteur.setGrade(auteur.getGrade());
-        Auteur updatedAuteur = auteurRepository.save(auteur);
-        return updatedAuteur;
+        return auteurRepository.save(auteur);
     }
 
     @Override
@@ -226,35 +221,22 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Optional<Auteur> searchAuteurById(Long id) {
         log.info("finding auteur with id : " +id);
-        Optional<Auteur> byId = auteurRepository.findById(id);
-        return byId;
+        return auteurRepository.findById(id);
     }
 
     @Override
     public List<Auteur> getAllAuteur() {
-        List<Auteur> all = auteurRepository.findAll();
-        return all;
+        return auteurRepository.findAll();
     }
 
     @Override
     public List<Auteur> searchAuteur(String keyword) {
-        List<Auteur> byNameContainingIgnoreCase = auteurRepository.searchAuteur(keyword).stream().collect(Collectors.toList());
-        return byNameContainingIgnoreCase;
+        return new ArrayList<>(auteurRepository.searchAuteur(keyword));
     }
 
     @Override
     public int getSupportNumber() {
         return (int) supportRepository.count();
     }
-
-//    @Override
-//    public int getUploadedFileNumber() {
-//        return supportRepository.countUploadedFile();
-//    }
-//
-//    @Override
-//    public Double getSizeDocuments() {
-//        return supportRepository.getTotalSize();
-//    }
 
 }
