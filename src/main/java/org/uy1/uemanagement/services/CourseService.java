@@ -17,6 +17,8 @@ public interface CourseService {
 
    Course createCourse(Course course) throws DuplicateCourseException;
    Course updateCourse(Course course) throws DuplicateCourseException;
+
+   List<Course> saveListCourse(List<Course> courses);
    void removeCourse(Long id);
    List<Course> getAllCourse();
    List<Course> findCourseByTitle(String name);

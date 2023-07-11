@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CourseServiceImpl implements CourseService {
 
-    private CourseRepository courseRepository;
-    private SupportRepository supportRepository;
-    private AuteurRepository auteurRepository;
+    private final CourseRepository courseRepository;
+    private final SupportRepository supportRepository;
+    private final AuteurRepository auteurRepository;
 
     public CourseServiceImpl(CourseRepository courseRepository, SupportRepository supportRepository, AuteurRepository auteurRepository) {
         this.courseRepository = courseRepository;
@@ -42,8 +42,7 @@ public class CourseServiceImpl implements CourseService {
                 .times(course.getTimes())
                 .nbCredit(course.getNbCredit())
                 .build();
-        Course savedCourse = courseRepository.save(course);
-        return savedCourse;
+        return courseRepository.save(course);
     }
 
 
@@ -57,8 +56,24 @@ public class CourseServiceImpl implements CourseService {
         course.setDescription(course.getDescription());
         course.setTimes(course.getTimes());
         course.setNbCredit(course.getNbCredit());
-        Course updatedCourse = courseRepository.save(course);
-        return updatedCourse;
+        return courseRepository.save(course);
+    }
+
+    @Override
+    public List<Course> saveListCourse(List<Course> courses) {
+        log.info("Saving list course");
+
+        return courses.stream().map(course -> {
+            if (!courseRepository.existsById(course.getId())) {
+                throw new DuplicateCourseException("Course id not exist");
+            }
+            return Course.builder()
+                    .title(course.getTitle())
+                    .description(course.getDescription())
+                    .times(course.getTimes())
+                    .nbCredit(course.getNbCredit())
+                    .build();
+        }).map(courseRepository::save).collect(Collectors.toList());
     }
 
     @Override
